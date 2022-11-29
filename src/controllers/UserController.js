@@ -22,13 +22,72 @@ export default class UserController {
     }
   }
 
-  static async userList(req, res) {
-    try {
-      const list = await UserTasksModel.find()
+  static async login(req ,res) {
+    let { email, password } = req.body
 
-      return res.status(200).json({ list, status: 200 })
+    try {
+      const user = await UserTasksModel.find({ email })
+
+      if (!user.at()) return res.status(401).json({ message: 'E-mail ou senha inválidos.', status: 401 })
+
+      const isValidPassword = await bcrypt.compare(password, user[0].password)
+      
+      if (!isValidPassword) return res.status(401).json({ message: 'E-mail ou senha inválidos.', status: 401 })
+
+      req.session.userId = user[0].id
+
+      // return res.status(200).json({ message: 'Credenciais válidas.', status: 200 })
+      return res.status(200).redirect('/home')
+    } catch (error) {
+      return res.status(400).json({ message: 'Ocorreu um erro', status: 400 })
+    }
+  }
+
+  static async tasks(req, res) {
+    let id = req.session.userId
+
+    try {
+      const datas = await UserTasksModel.findById(id)
+      
+      return res.status(200).json({ tasks: datas.tasks, status: 200 })
     } catch (error) {
       return res.status(400).json({ message: 'Ocorreu um erro.', status: 400 })
+    }
+  }
+
+  static async userList(req, res) {
+    try {
+      const users = await UserTasksModel.find()
+
+      return res.status(200).json({ users, status: 200 })
+    } catch (error) {
+      return res.status(400).json({ message: 'Ocorreu um erro.', status: 400 })
+    }
+  }
+
+  static async deleteUser(req, res) {
+    let { id } = req.body
+
+    try {
+      const deleted = await UserTasksModel.findByIdAndDelete(id)
+
+      if (deleted) return res.status(200).json({ message: 'Usuário excluido com sucesso.', status: 200 })
+
+      return res.status(404).json({ message: 'Usuário não existe.', status: 404 })
+    } catch (error) {
+      return res.status(400).json({ message: 'Ocorreu um erro.', status: 400 })
+    }
+  }
+
+  static async updateUser(req, res) {
+    let { id } = req.body
+
+    try {
+      await UserTasksModel.findByIdAndUpdate(id, req.body)
+
+      return res.status(200).json({ message: 'Alterações realizadas com sucesso.', status: 200 })
+    } catch (error) {
+      return res.status(400).json({ message: 'Ocorreu um erro ao atualizar.', status: 400 })
     }
   }
 }
