@@ -8,7 +8,6 @@ const UserTasksSchema = new Schema({
   password: String,
   tasks: [
     {
-      id: String,
       title: String,
       // createdData: Date
       description: String,
