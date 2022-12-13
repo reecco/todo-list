@@ -2,4 +2,4 @@
 
 ### Built with
 - Node.js
-- Mongo.db
+- MongoDB
