@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import randomstring from 'randomstring'
 
-import UserTasksModel from "../models/UserTasks.js"
+import UserModel from "../models/User.js"
 
 export default class UserController {
   static async register(req, res) {
@@ -10,11 +10,11 @@ export default class UserController {
     const hash = await bcrypt.hash(password, 10)
 
     try {
-      const isValid = await UserTasksModel.find({ email })
+      const isValid = await UserModel.find({ email })
 
       if (isValid.at()) return res.status(400).json({ message: 'E-mail já cadastrado.', status: 400 })
 
-      const createdUser = await UserTasksModel.create({ username, email, password: hash })
+      const createdUser = await UserModel.create({ username, email, password: hash })
 
       return res.status(200).json({ message: 'Usuário cadastrado com sucesso.', createdUser, status: 200 })
     } catch (error) {
@@ -44,21 +44,9 @@ export default class UserController {
     }
   }
 
-  static async tasks(req, res) {
-    let id = req.session.userId
-
-    try {
-      const datas = await UserTasksModel.findById(id)
-
-      return res.status(200).json({ tasks: datas.tasks, status: 200 })
-    } catch (error) {
-      return res.status(400).json({ message: 'Ocorreu um erro.', status: 400 })
-    }
-  }
-
   static async userList(req, res) {
     try {
-      const users = await UserTasksModel.find()
+      const users = await UserModel.find()
 
       return res.status(200).json({ users, status: 200 })
     } catch (error) {
@@ -89,30 +77,6 @@ export default class UserController {
       return res.status(200).json({ message: 'Alterações realizadas com sucesso.', status: 200 })
     } catch (error) {
       return res.status(400).json({ message: 'Ocorreu um erro ao atualizar.', status: 400 })
-    }
-  }
-
-  static async newTask(req, res) {
-    let { id, title, description } = req.body
-
-    try {
-      await UserTasksModel.findByIdAndUpdate(id, { tasks: { title, description } })
-
-      return res.status(200).json({ message: 'Tarefa adicionada com sucesso.', status: 200 })
-    } catch (error) {
-      console.log(error)
-      return res.status(400).json({ message: 'Ocorreu um erro ao adicionar a tarefa.', status: 400 })
-    }
-  }
-
-  static async removeTask(req, res) {
-    let { id, idTask } = req.body
-
-    try {
-      await UserTasksModel.findByIdAndRemove(id, { tasks: { id: idTask } })
-      return res.status(200).json({ message: 'Tarefa excluida com sucesso.', status: 200 })
-    } catch (error) {
-      return res.status(400).json({ message: 'Ocorreu um erro ao excluir a tarefa.', status: 400 })
     }
   }
 }

@@ -2,6 +2,7 @@ import express from "express"
 import session from 'express-session'
 
 import user from './userRoutes.js'
+import task from './taskRoutes.js'
 
 const routes = (app) => {
   app.route('/').get((req, res) => {
@@ -11,7 +12,8 @@ const routes = (app) => {
   app.use(
     express.json(),
     session({ secret: 'teste', resave: false, saveUninitialized: false }),
-    user
+    user,
+    task
   )
 }
 
