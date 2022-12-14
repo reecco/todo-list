@@ -33,7 +33,7 @@ export default class TaskController {
     await UserModel.findById(id).then(async (datas) => {
       return await TaskModel.find({ userId: datas.id })
     }).catch(error => {
-      return res.status(400).json({ message: 'Usuário não encontrado.', status: 404 })
+      return res.status(401).json({ message: 'Usuário não encontrado.', status: 401 })
     })
 
     await TaskModel.findByIdAndDelete(taskId).then((task) => {
@@ -44,7 +44,7 @@ export default class TaskController {
 
       return res.status(200).json({ message: 'Tarefa excluida com sucesso.', status: 200 })
     }).catch(() => {
-      return res.status(400).json({ message: 'Ocorreu um erro ao excluir a tarefa.', status: 400 })
+      return res.status(403).json({ message: 'Ocorreu um erro ao excluir a tarefa.', status: 403 })
     })
   }
 
@@ -54,8 +54,10 @@ export default class TaskController {
     try {
       const user = await UserModel.findById(id)
 
+      const dateCreated = new Date()
+
       console.log(user.id)
-      await TaskModel.create({ userId: user.id, title, description })
+      await TaskModel.create({ userId: user.id, title, dateCreated, description })
 
       return res.status(200).json({ message: 'Tarefa adicionada com sucesso.', status: 200 })
     } catch (error) {
