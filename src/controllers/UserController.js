@@ -27,7 +27,7 @@ export default class UserController {
     let { email, password } = req.body
 
     try {
-      const user = await UserTasksModel.find({ email })
+      const user = await UserModel.find({ email })
 
       if (!user.at()) return res.status(401).json({ message: 'E-mail ou senha inválidos.', status: 401 })
 
@@ -35,10 +35,10 @@ export default class UserController {
 
       if (!isValidPassword) return res.status(401).json({ message: 'E-mail ou senha inválidos.', status: 401 })
 
-      req.session.userId = user[0].id
+      // req.session.userId = user[0].id
 
       // return res.status(200).json({ message: 'Credenciais válidas.', status: 200 })
-      return res.status(200).redirect('/home')
+      return res.status(200).redirect('/home/' + user[0].id)
     } catch (error) {
       return res.status(400).json({ message: 'Ocorreu um erro', status: 400 })
     }
@@ -58,7 +58,7 @@ export default class UserController {
     let { id } = req.body
 
     try {
-      const deleted = await UserTasksModel.findByIdAndDelete(id)
+      const deleted = await UserModel.findByIdAndDelete(id)
 
       if (deleted) return res.status(200).json({ message: 'Usuário excluido com sucesso.', status: 200 })
 
@@ -72,7 +72,7 @@ export default class UserController {
     let { id } = req.body
 
     try {
-      await UserTasksModel.findByIdAndUpdate(id, req.body)
+      await UserModel.findByIdAndUpdate(id, req.body)
 
       return res.status(200).json({ message: 'Alterações realizadas com sucesso.', status: 200 })
     } catch (error) {

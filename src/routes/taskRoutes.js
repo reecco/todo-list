@@ -6,8 +6,8 @@ const router = Router()
 
 router
   .post('/newtask', TaskController.newTask)
-  .get('/home', TaskController.tasks)
-  .get('/listtasks/:id', TaskController.tasksList)
+  .get('/home/:id', TaskController.tasks)
+  .get('/task/list/:id', TaskController.fullTaskList)
   .delete('/task', TaskController.removeTask)
 
 export default router
