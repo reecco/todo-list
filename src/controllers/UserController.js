@@ -32,6 +32,8 @@ export default class UserController {
   static async login(req, res) {
     let { email, password } = req.body
 
+    if (!email || !password) return res.status(400).json({ message: 'Sintaxe inválida', status: 400 })
+
     const secret = process.env.SECRET_JWT
 
     try {
@@ -43,11 +45,9 @@ export default class UserController {
 
       if (!isValidPassword) return res.status(401).json({ message: 'E-mail ou senha inválidos.', status: 401 })
 
-      req.session.userId = user[0].id
+      const token = jwt.sign({ id: user[0].id }, secret, { expiresIn: '1m' })
 
-      const token = jwt.sign({ id: user[0].id }, secret)
-      
-
+      req.session.userId = user[0].userId
 
       return res.status(200).json({ message: 'Credenciais válidas.', token, status: 200 })
       // return res.status(200).redirect('/home/' + user[0].userId)
